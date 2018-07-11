@@ -17,7 +17,7 @@ const r = new Snoowrap({
 const client = new Snoostorm(r);
 
 const streamOpts = {
-  subreddit: 'testingground4bots',
+  subreddit: 'all',
   results: 25
 };
 
@@ -26,6 +26,7 @@ const comments = client.CommentStream(streamOpts);
 comments.on('comment', (comment) => {
   // Translate fully Chinese comments
   if (franc(comment.body, {minLength: 1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
+    console.log('*** CHINESE DETECTED ... TRANSLATING! ***')
     translate.translate(comment.body, { to: 'en' }, function(err, res) {
       comment.reply(
 // Left-aligned to avoid Reddit autoformatting as code block
@@ -35,7 +36,7 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English in /r/china. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
+*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English. If I'm misbehaving, message /u/paleforce*`
       );
     });
   } else {
@@ -43,6 +44,7 @@ comments.on('comment', (comment) => {
     const splitComment = comment.body.split(' ');
     for (i = 0; i < splitComment.length; i++) {
       if (franc(splitComment[i], {minLength:1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
+        console.log('*** CHINESE DETECTED ... TRANSLATING! ***')
         let originalComment = splitComment[i]
         translate.translate(splitComment[i], { to: 'en' }, function(err, res) {
           comment.reply(
@@ -53,7 +55,7 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English in /r/china. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
+*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English. If I'm misbehaving, message /u/paleforce*`
           );
         });
       }
