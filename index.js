@@ -17,7 +17,7 @@ const r = new Snoowrap({
 const client = new Snoostorm(r);
 
 const streamOpts = {
-  subreddit: 'all',
+  subreddit: 'china',
   results: 25
 };
 
