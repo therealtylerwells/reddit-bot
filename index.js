@@ -17,7 +17,7 @@ const r = new Snoowrap({
 const client = new Snoostorm(r);
 
 const streamOpts = {
-  subreddit: 'china',
+  subreddit: 'china+testingground4bots+shanghai',
   results: 25
 };
 
@@ -36,12 +36,12 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English. If I'm misbehaving, message /u/paleforce*`
+*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
       );
     });
   } else {
     // Translate partially Chinese comments
-    const splitComment = comment.body.split(' ');
+    const splitComment = comment.body.split('\n').join(' ').split(' ');
     for (i = 0; i < splitComment.length; i++) {
       if (franc(splitComment[i], {minLength:1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
         console.log('*** CHINESE DETECTED ... TRANSLATING! ***')
@@ -55,7 +55,7 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm a bot. I use [Yandex Translate](https://translate.yandex.com/) to translate Chinese comments to English. If I'm misbehaving, message /u/paleforce*`
+*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
           );
         });
       }
