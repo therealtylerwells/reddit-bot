@@ -36,7 +36,7 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
+*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u\/paleforce*`
       );
     });
   } else {
@@ -55,7 +55,7 @@ comments.on('comment', (comment) => {
 
 
 
-*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u/paleforce*`
+*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u\/paleforce*`
           );
         });
       }
