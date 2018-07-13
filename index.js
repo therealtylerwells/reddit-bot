@@ -4,7 +4,7 @@ const Snoowrap = require('snoowrap');
 const Snoostorm = require('snoostorm');
 
 const franc = require('franc')
-var translate = require('yandex-translate')(process.env.YANDEX_KEY);
+const translate = require("baidu-translate-api");
 
 const r = new Snoowrap({
   userAgent: process.env.USER_AGENT,
@@ -17,7 +17,7 @@ const r = new Snoowrap({
 const client = new Snoostorm(r);
 
 const streamOpts = {
-  subreddit: 'china+testingground4bots+shanghai',
+  subreddit: 'testingground4bots+china+shanghai',
   results: 25
 };
 
@@ -26,39 +26,50 @@ const comments = client.CommentStream(streamOpts);
 comments.on('comment', (comment) => {
   // Translate fully Chinese comments
   if (franc(comment.body, {minLength: 1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
-    console.log('*** CHINESE DETECTED ... TRANSLATING! ***')
-    translate.translate(comment.body, { to: 'en' }, function(err, res) {
-      comment.reply(
+    console.log(new Date().toLocaleString() + ' | Translating full comment ... ')
+    translate(comment.body).then(response => {
+      setTimeout(comment.reply(
 // Left-aligned to avoid Reddit autoformatting as code block
-`**Translation:** ${res.text}
+`**Translation:** ${response.trans_result.dst}
 
-**Original Text:** ${comment.body}
+**Original Text:** ${response.trans_result.src}
 
+---
 
-
-*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u\/paleforce*`
-      );
-    });
+*I'm automated. View my profile for more info. Sorry if my translations suck. ^(Blame Baidu)*`
+      ), 5000);
+    })    
   } else {
     // Translate partially Chinese comments
     const splitComment = comment.body.split('\n').join(' ').split(' ');
+    let chineseChunks = [];
+    let responseString = ''
+    let completedRequests = 0;
     for (i = 0; i < splitComment.length; i++) {
       if (franc(splitComment[i], {minLength:1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
-        console.log('*** CHINESE DETECTED ... TRANSLATING! ***')
+        console.log(new Date().toLocaleString() + ' | Translating partial comment ... ')
         let originalComment = splitComment[i]
-        translate.translate(splitComment[i], { to: 'en' }, function(err, res) {
-          comment.reply(
-// Left-aligned to avoid Reddit autoformatting as code block
-`**Translation:** ${res.text}
-
-**Original Text:** ${originalComment}
-
-
-
-*I'm automated. If I'm misbehaving or if you want me to work in another sub, message /u\/paleforce*`
-          );
-        });
+        chineseChunks.push(originalComment)
       }
+    }
+    for (i = 0; i < chineseChunks.length; i++) {
+      translate(chineseChunks[i]).then(response => {
+      responseString = responseString + 
+`
+
+**Translation:** ${response.trans_result.dst} 
+
+**Original Text:** ${response.trans_result.src}
+
+---
+`
+      completedRequests++
+      }).then(() => {
+        if (completedRequests == chineseChunks.length) {
+          responseString = responseString + `*I'm automated. View my profile for more info. Sorry if my translations suck. ^(Blame Baidu)*`
+          comment.reply(responseString)
+        }
+      })
     }
   }
 });
