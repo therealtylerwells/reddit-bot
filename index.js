@@ -5,6 +5,7 @@ const Snoostorm = require('snoostorm');
 
 const franc = require('franc')
 const translate = require("baidu-translate-api");
+const pinyin = require('pinyin')
 
 const r = new Snoowrap({
   userAgent: process.env.USER_AGENT,
@@ -17,7 +18,7 @@ const r = new Snoowrap({
 const client = new Snoostorm(r);
 
 const streamOpts = {
-  subreddit: 'testingground4bots+china+shanghai',
+  subreddit: 'china+shanghai',
   results: 25
 };
 
@@ -28,16 +29,18 @@ comments.on('comment', (comment) => {
   if (franc(comment.body, {minLength: 1}) == 'cmn' && comment.author.name !== 'chinese_to_english') {
     console.log(new Date().toLocaleString() + ' | Translating full comment ... ')
     translate(comment.body).then(response => {
+      let translatedPinyin = pinyin(response.trans_result.src).join(' ')
       setTimeout(comment.reply(
-// Left-aligned to avoid Reddit autoformatting as code block
-`**Translation:** ${response.trans_result.dst}
+// // Left-aligned to avoid Reddit autoformatting as code block
+`**English:** ${response.trans_result.dst}
 
-**Original Text:** ${response.trans_result.src}
+**Chinese:** ${response.trans_result.src}
+
+**Pinyin:** ${translatedPinyin}
 
 ---
-
 *I'm automated. View my profile for more info. Sorry if my translations suck. ^(Blame Baidu)*`
-      ), 5000);
+      ), 7500);
     })    
   } else {
     // Translate partially Chinese comments
@@ -54,12 +57,14 @@ comments.on('comment', (comment) => {
     }
     for (i = 0; i < chineseChunks.length; i++) {
       translate(chineseChunks[i]).then(response => {
+      let translatedPinyin = pinyin(response.trans_result.src).join(' ')
       responseString = responseString + 
 `
+**English:** ${response.trans_result.dst} 
 
-**Translation:** ${response.trans_result.dst} 
+**Chinese:** ${response.trans_result.src}
 
-**Original Text:** ${response.trans_result.src}
+**Pinyin:** ${translatedPinyin}
 
 ---
 `
