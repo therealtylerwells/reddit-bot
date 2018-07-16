@@ -1,8 +1,6 @@
 require('dotenv').config();
-
 const Snoowrap = require('snoowrap');
 const Snoostorm = require('snoostorm');
-
 const franc = require('franc')
 const translate = require("baidu-translate-api");
 const pinyin = require('pinyin')
@@ -32,14 +30,14 @@ comments.on('comment', (comment) => {
       let translatedPinyin = pinyin(response.trans_result.src).join(' ')
       setTimeout(comment.reply(
 // // Left-aligned to avoid Reddit autoformatting as code block
-`**English:** ${response.trans_result.dst}
+`**Translation:** ${response.trans_result.dst}
 
-**Chinese:** ${response.trans_result.src}
+**Original Text:** ${response.trans_result.src}
 
 **Pinyin:** ${translatedPinyin}
 
 ---
-*I'm automated. View my profile for more info. Sorry if my translations suck. ^(Blame Baidu)*`
+*^(I'm automated. Translations are from Baidu Translate.)*`
       ), 7500);
     })    
   } else {
@@ -60,9 +58,9 @@ comments.on('comment', (comment) => {
       let translatedPinyin = pinyin(response.trans_result.src).join(' ')
       responseString = responseString + 
 `
-**English:** ${response.trans_result.dst} 
+**Translation:** ${response.trans_result.dst} 
 
-**Chinese:** ${response.trans_result.src}
+**Original Text:** ${response.trans_result.src}
 
 **Pinyin:** ${translatedPinyin}
 
@@ -71,7 +69,7 @@ comments.on('comment', (comment) => {
       completedRequests++
       }).then(() => {
         if (completedRequests == chineseChunks.length) {
-          responseString = responseString + `*I'm automated. View my profile for more info. Sorry if my translations suck. ^(Blame Baidu)*`
+          responseString = responseString + `*^(I'm automated. Translations are from Baidu Translate.)*`
           comment.reply(responseString)
         }
       })
