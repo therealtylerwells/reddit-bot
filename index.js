@@ -28,17 +28,25 @@ comments.on('comment', (comment) => {
     console.log(new Date().toLocaleString() + ' | Translating full comment ... ')
     translate(comment.body).then(response => {
       let translatedPinyin = pinyin(response.trans_result.src).join(' ')
-      setTimeout(comment.reply(
-// // Left-aligned to avoid Reddit autoformatting as code block
+      if (response.trans_result.src.length > 10) {
+        setTimeout(comment.reply(
+// Long comments (don't put pinyin on same line as original text)
+// Left-aligned to avoid Reddit autoformatting as code block
 `**Translation:** ${response.trans_result.dst}
 
-**Original Text:** ${response.trans_result.src}
+**Original Text:** ${response.trans_result.src} 
 
-**Pinyin:** ${translatedPinyin}
+**Pinyin:** ${translatedPinyin}`
+        ), 5000); // 5000 ms delay to avoid ratelimit
+      } else {
+        // Short comments (pinyin + original text on same line)
+        setTimeout(comment.reply(
+// Left-aligned to avoid Reddit autoformatting as code block
+`**Translation:** ${response.trans_result.dst}
 
----
-*^(I'm automated. Translations are from Baidu Translate.)*`
-      ), 7500);
+**Original Text:** ${response.trans_result.src} *(${translatedPinyin})*`
+        ), 5000); // 5000 ms delay to avoid rate limit
+      }
     })    
   } else {
     // Translate partially Chinese comments
@@ -57,20 +65,18 @@ comments.on('comment', (comment) => {
       translate(chineseChunks[i]).then(response => {
       let translatedPinyin = pinyin(response.trans_result.src).join(' ')
       responseString = responseString + 
+// Left-aligned to avoid Reddit autoformatting as code block
 `
 **Translation:** ${response.trans_result.dst} 
 
-**Original Text:** ${response.trans_result.src}
-
-**Pinyin:** ${translatedPinyin}
+**Original Text:** ${response.trans_result.src} *(${translatedPinyin})*
 
 ---
 `
       completedRequests++
       }).then(() => {
         if (completedRequests == chineseChunks.length) {
-          responseString = responseString + `*^(I'm automated. Translations are from Baidu Translate.)*`
-          comment.reply(responseString)
+          setTimeout(comment.reply(responseString), 5000) // 5000 ms delay to avoid rate limit
         }
       })
     }
